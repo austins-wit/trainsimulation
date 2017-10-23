@@ -13,7 +13,6 @@ import java.util.ArrayList;
  */
 public class TrainRoute
 {
-	private ArrayList<Passenger> passengers;
 	private ArrayList<Station> stations;
 	private ArrayList<Train> trains;
 	private int trackLength;
@@ -44,6 +43,9 @@ public class TrainRoute
 	public void addPassengerToStation(Passenger passenger)
 	{
 		//TODO: Implement
+		// get passenger starting station id
+		// find station in stations with station id
+		// add passenger to station
 	}
 	
 	/**
@@ -54,6 +56,8 @@ public class TrainRoute
 	public void addPassengerToTrain(Passenger passenger, int trainId)
 	{
 		//TODO: Implement
+		// find train in trains with train id
+		// add passenger to train
 	}
 	
 	/**
@@ -63,6 +67,10 @@ public class TrainRoute
 	public void addStation(int location)
 	{
 		//TODO: Implement
+		
+		Station station = new Station();
+		// add location data to station
+		stations.add(station);
 	}
 	
 	/**
@@ -73,6 +81,10 @@ public class TrainRoute
 	public void addTrain(int location, boolean inbound)
 	{
 		//TODO: Implement
+		
+		Train train = new Train();
+		// add location and direction data to train
+		trains.add(train);
 	}
 	
 	/**
@@ -83,6 +95,10 @@ public class TrainRoute
 	public Station getStation(int id)
 	{
 		//TODO: Implement
+		for (Station station : stations)
+		{
+			// if station.getId() == id, then return station
+		}
 		return null;
 	}
 	
@@ -99,6 +115,10 @@ public class TrainRoute
 	public Train getTrain(int id)
 	{
 		//TODO: Implement
+		for (Train train : trains)
+		{
+			// if train.getId() == id, then return train;
+		}
 		return null;
 	}
 	
@@ -120,6 +140,10 @@ public class TrainRoute
 	private void moveTrains()
 	{
 		//TODO: Implement
+		for (Train train : trains)
+		{
+			// train.move()
+		}
 	}
 	
 	/**
@@ -131,5 +155,20 @@ public class TrainRoute
 	private void checkForArrivals()
 	{
 		//TODO: Implement
+		for (Train train : trains)
+		{
+			for (Station station : stations)
+			{
+				// if train.getLocation() == station.getLocation()
+				//     train.arrivesAtStation()?
+				//     station.trainArrives()?
+				//     then break out of loop
+			}
+		}
+	}
+
+	public void setTrackLength(int trackLength) 
+	{
+		this.trackLength = trackLength;
 	}
 }
