@@ -1,168 +1,78 @@
 package edu.wit.dcsn.comp2000.queueapp;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Random;
-import java.util.Scanner;
+import edu.wit.dcsn.ds.rosenbergd.queueapp.Configuration;
 
 public class TrainSimulation
 {
 	private static TrainRoute trainRoute;
 	private static Random rand;
 	private static int ticks;
-	private static long seed;
-	private static int trackLength;
-	private static int trainCapacity;
-	private static int initialPassengers;
-	private static int passengerRate;
-	
-	private static final int DEFAULT_TICKS = 50;
-	private static final long DEFAULT_SEED = 0;
-	private static final int DEFAULT_TRACK_LENGTH = 50;
-	private static final int DEFAULT_TRAIN_CAPACITY = 20;
-	private static final int DEFAULT_INITIAL_PASSENGERS = 50;
-	private static final int DEFAULT_PASSENGER_RATE = 50;
-	
-	private static final String CONFIG_FILENAME = "TrainSimulation.config";
-	
+
 	/**
-	 * Runs a simulation of a train route. Reads a config file that specifies certain parameters
-	 * about how the simulation should be set up.
+	 * Runs a simulation of a train route.
 	 * @param args
 	 */
-	public static void main(String[] args)
+	public static void main(String[] args) throws FileNotFoundException, IOException
 	{
-		try {
-			Logger.initialize();
-		} catch (IOException e) {
-			e.printStackTrace();
-			return;
-		}
-		
-		trainRoute = new TrainRoute();
-		
-		initializeConfigValues();
-		
-		loadConfig();
-		
+		Logger.initialize();
+		Configuration config = new Configuration();
+
 		// Build simulation based on config values.
-		trainRoute.setTrackLength(trackLength);
-		rand = new Random(seed);
+		ticks = config.getTicks();
+		trainRoute = new TrainRoute(config.getRoute().length);
+		rand = new Random(config.getSeed());
 		
-		// Initialize stations
-		for (int i = 0; i < 10; ++i)
+		Configuration.TrainSpec[] trainSpecs = config.getTrains();
+		for (int i = 0; i < trainSpecs.length; ++i)
 		{
-			int location = (int)Math.random() * trainRoute.getTrackLength() + 1;
-			trainRoute.addStation(location);
+			trainRoute.addTrain(trainSpecs[i].location, trainSpecs[i].direction, trainSpecs[i].capacity);
 		}
 		
-		// Initialize trains
-		for (int i = 0; i < 10; ++i)
+		int[] stationLocations = config.getStations();
+		for (int i = 0; i < stationLocations.length; ++i)
 		{
-			int location = (int)Math.random() * trainRoute.getTrackLength() + 1;
-			boolean inbound = Math.random() < 0.5;
-			trainRoute.addTrain(location, inbound);
+			trainRoute.addStation(stationLocations[i]);
 		}
 		
-		// Initialize passengers
-		for (int i = 0; i < initialPassengers; ++i)
-		{
-			trainRoute.addPassengerToStation(new Passenger());
-		}
+		Configuration.PairedLimit[] passengerSpecs = config.getPassengers();
+		int passengersInitialMin = passengerSpecs[Configuration.PASSENGERS_INITIAL].minimum;
+		int passengersInitialMax = passengerSpecs[Configuration.PASSENGERS_INITIAL].maximum;
+		createRandomNewPassengers(passengersInitialMin, passengersInitialMax);
+		
+		int passengersPerTickMin = passengerSpecs[Configuration.PASSENGERS_PER_TICK].minimum;
+		int passengersPerTickMax = passengerSpecs[Configuration.PASSENGERS_PER_TICK].maximum;
 		
 		// Iterate through the simulation
 		for (int i = 1; i <= ticks; ++i)
 		{
 			Logger.startNextTick(i);
-			int newPassengers = rand.nextInt(passengerRate+1);
+			
+			int newPassengers = createRandomNewPassengers(passengersPerTickMin, passengersPerTickMax);
 			Logger.passengersHaveArrived(newPassengers);
-			for (int j = 0; j < newPassengers; ++j)
-			{
-				trainRoute.addPassengerToStation(new Passenger());
-			}
+
 			trainRoute.update();
 		}
-		
+
 		Logger.close();
 	}
 	
-	private static void initializeConfigValues()
+	/**
+	 * Creates a random number of passengers between passengersMin and passengersMax, inclusive,
+	 * and add them to the stations on the route.
+	 * @param passengersMin the minimum number of passengers to be created
+	 * @param passengersMax the maximum number of passengers to be created
+	 * @return the number of passengers created
+	 */
+	private static int createRandomNewPassengers(int passengersMin, int passengersMax)
 	{
-		ticks = DEFAULT_TICKS;
-		seed = DEFAULT_SEED;
-		trackLength = DEFAULT_TRACK_LENGTH;
-		trainCapacity = DEFAULT_TRAIN_CAPACITY;
-		initialPassengers = DEFAULT_INITIAL_PASSENGERS;
-		passengerRate = DEFAULT_PASSENGER_RATE;
-	}
-	
-	private static void loadConfig()
-	{
-		Scanner sc;
-		try {
-			sc = new Scanner(new File(CONFIG_FILENAME));
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-			return;
-		}
-		
-		while (sc.hasNextLine())
+		int newPassengers = passengersMin + rand.nextInt(passengersMax - passengersMin + 1);
+		for (int i = 0; i < newPassengers; ++i)
 		{
-			String nextLine = sc.nextLine();
-			nextLine = nextLine.split("#")[0];
-			
-			String[] assignmentPair = nextLine.split("=");
-			if (assignmentPair.length == 2)
-			{
-				String variable = assignmentPair[0].trim();
-				String value = assignmentPair[1].trim();
-				String[] locations;
-				String[] trainDatas;
-				String[] trainData;
-				switch (variable)
-				{
-				case "ticks":
-					ticks = Integer.parseInt(value);
-					break;
-				case "seed":
-					seed = Long.parseLong(value);
-					break;
-				case "trackLength":
-					trackLength = Integer.parseInt(value);
-					break;
-				case "stationsAt":
-					locations = value.split(",");
-					for (int i = 0; i < locations.length; ++i)
-					{
-						trainRoute.addStation(Integer.parseInt(locations[i].trim()));
-					}
-					break;
-				case "trainsAt":
-					trainDatas = value.split(",");
-					for (int i = 0; i < trainDatas.length; ++i)
-					{
-						trainData = trainDatas[i].split("/");
-						// trainData[0] = location
-						// trainData[1] = direction
-						// trainData[2] = capacity (can be excluded)
-					}
-					break;
-				case "trainCapacity":
-					trainCapacity = Integer.parseInt(value); 
-					break;
-				case "initialPassengers":
-					initialPassengers = Integer.parseInt(value);
-					break;
-				case "passengerRate":
-					passengerRate = Integer.parseInt(value);
-					break;
-				default:
-					break;
-				}
-			}
+			trainRoute.addPassengerToStation(new Passenger());
 		}
-		
-		sc.close();
+		return newPassengers;
 	}
 }

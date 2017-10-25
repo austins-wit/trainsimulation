@@ -2,6 +2,8 @@ package edu.wit.dcsn.comp2000.queueapp;
 
 import java.util.ArrayList;
 
+import edu.wit.dcsn.ds.rosenbergd.queueapp.Direction;
+
 /**
  * Representation of a train route. Route has two tracks, one going clockwise and
  * one going counter-clockwise. The two tracks have identical lengths. Stations
@@ -34,6 +36,8 @@ public class TrainRoute
 	TrainRoute(int trackLength)
 	{
 		this.trackLength = trackLength;
+		stations = new ArrayList<Station>();
+		trains = new ArrayList<Train>();
 	}
 	
 	/**
@@ -68,23 +72,40 @@ public class TrainRoute
 	{
 		//TODO: Implement
 		
-		Station station = new Station();
+		//Station station = new Station();
 		// add location data to station
-		stations.add(station);
+		//stations.add(station);
 	}
 	
 	/**
 	 * Add a train to the route.
 	 * @param location The location of the train on the route.
 	 * @param inbound The direction of the train.
+	 * @param capacity The capacity of the train.
 	 */
-	public void addTrain(int location, boolean inbound)
+	public void addTrain(int location, Direction direction, int capacity)
 	{
 		//TODO: Implement
 		
-		Train train = new Train();
-		// add location and direction data to train
-		trains.add(train);
+		//Train train = new Train();
+	}
+	
+	/**
+	 * Get the number of stations on the route.
+	 * @return the number of stations on the route.
+	 */
+	public int getNumberOfStations()
+	{
+		return stations.size();
+	}
+	
+	/**
+	 * Get the number of trains on the route.
+	 * @return the number of trains on the route.
+	 */
+	public int getNumberOfTrains()
+	{
+		return trains.size();
 	}
 	
 	/**
@@ -131,7 +152,8 @@ public class TrainRoute
 	 */
 	public void update()
 	{
-		//TODO: Implement
+		moveTrains();
+		checkForArrivals();
 	}
 	
 	/**
@@ -165,10 +187,5 @@ public class TrainRoute
 				//     then break out of loop
 			}
 		}
-	}
-
-	public void setTrackLength(int trackLength) 
-	{
-		this.trackLength = trackLength;
 	}
 }
