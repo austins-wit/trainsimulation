@@ -19,16 +19,6 @@ public class TrainRoute
 	private ArrayList<Train> trains;
 	private int trackLength;
 	
-	private static final int DEFAULT_TRACK_LENGTH = 50;
-	
-	/**
-	 * Creates a TrainRoute with the default track length.
-	 */
-	TrainRoute()
-	{
-		this(DEFAULT_TRACK_LENGTH);
-	}
-	
 	/**
 	 * Creates a TrainRoute.
 	 * @param trackLength Length of the track.
@@ -85,9 +75,7 @@ public class TrainRoute
 	 */
 	public void addTrain(int location, Direction direction, int capacity)
 	{
-		//TODO: Implement
-		
-		//Train train = new Train();
+		trains.add(new Train(trackLength, capacity, location, direction));
 	}
 	
 	/**
@@ -138,7 +126,10 @@ public class TrainRoute
 		//TODO: Implement
 		for (Train train : trains)
 		{
-			// if train.getId() == id, then return train;
+			if (train.getTrainID() == id)
+			{
+				return train;
+			}
 		}
 		return null;
 	}
@@ -164,7 +155,7 @@ public class TrainRoute
 		//TODO: Implement
 		for (Train train : trains)
 		{
-			// train.move()
+			train.move();
 		}
 	}
 	
@@ -181,10 +172,12 @@ public class TrainRoute
 		{
 			for (Station station : stations)
 			{
-				// if train.getLocation() == station.getLocation()
-				//     train.arrivesAtStation()?
-				//     station.trainArrives()?
-				//     then break out of loop
+				 if (train.getLocation() == station.getLocation())
+				 {
+				     train.disembarkPassengers(station.getId());
+				     station.trainArrives(train);
+				     break;
+				 }
 			}
 		}
 	}
