@@ -1,5 +1,6 @@
 package edu.wit.dcsn.comp2000.queueapp;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import edu.wit.dcsn.ds.rosenbergd.queueapp.Direction;
@@ -36,22 +37,10 @@ public class TrainRoute
 	 */
 	public void addPassengerToStation(Passenger passenger)
 	{
-		//TODO: Implement
-		// get passenger starting station id
-		// find station in stations with station id
-		// add passenger to station
-	}
-	
-	/**
-	 * Adds a passenger to a train.
-	 * @param passenger The passenger object to add.
-	 * @param trainId The id of the train the passenger will be added to.
-	 */
-	public void addPassengerToTrain(Passenger passenger, int trainId)
-	{
-		//TODO: Implement
-		// find train in trains with train id
-		// add passenger to train
+		int stationId = passenger.getStartingStationId();
+		Station station = getStation(stationId);
+		station.passengerArrives(passenger);
+		Logger.passengerArrivesAtStation(passenger, station);
 	}
 	
 	/**
@@ -60,11 +49,7 @@ public class TrainRoute
 	 */
 	public void addStation(int location)
 	{
-		//TODO: Implement
-		
-		//Station station = new Station();
-		// add location data to station
-		//stations.add(station);
+		stations.add(new Station(this, location));
 	}
 	
 	/**
@@ -99,14 +84,16 @@ public class TrainRoute
 	/**
 	 * Get a station object from an id.
 	 * @param id Id number of the station.
-	 * @return The station object.
+	 * @return The station object. If the id does not match a station on this route, returns null.
 	 */
 	public Station getStation(int id)
 	{
-		//TODO: Implement
 		for (Station station : stations)
 		{
-			// if station.getId() == id, then return station
+			if (station.getId() == id)
+			{
+				return station;
+			}
 		}
 		return null;
 	}
@@ -119,11 +106,10 @@ public class TrainRoute
 	/**
 	 * Get a train object from an id.
 	 * @param id Id number of the train.
-	 * @return The train object.
+	 * @return The train object. If the id does not match a train on this route, returns null.
 	 */
 	public Train getTrain(int id)
 	{
-		//TODO: Implement
 		for (Train train : trains)
 		{
 			if (train.getTrainID() == id)
@@ -132,6 +118,20 @@ public class TrainRoute
 			}
 		}
 		return null;
+	}
+	
+	/**
+	 * Converts the data of the object into a string-friendly format.
+	 * @return  A string 
+	 */
+	public String toString()
+	{
+		StringBuilder string = new StringBuilder();
+		string.append("TrainRoute: length=" + getTrackLength());
+		string.append(", trains=" + getNumberOfTrains());
+		string.append(", stations=" + getNumberOfStations());
+		
+		return string.toString();
 	}
 	
 	/**
@@ -174,6 +174,7 @@ public class TrainRoute
 			{
 				 if (train.getLocation() == station.getLocation())
 				 {
+					 Logger.trainArrivedAtStation(train, station);
 				     train.disembarkPassengers(station.getId());
 				     station.trainArrives(train);
 				     break;
@@ -181,4 +182,65 @@ public class TrainRoute
 			}
 		}
 	}
+	
+	/**
+	 * Unit test driver for the train route.
+	 * @param args  -unused-
+	 */
+	public static void main(String[] args) throws IOException
+	{
+		Logger.initialize(true, true);
+		System.out.println("Testing TrainRoute...");
+
+		System.out.println("\nTesting TrainRoute setup...");
+		System.out.println("Testing new TrainRoute(20):");
+		TrainRoute trainRoute = new TrainRoute(20);
+		System.out.println(trainRoute.toString());
+		
+		System.out.println();
+		System.out.println("Testing trainRoute.addStation(0);");
+		System.out.println("        trainRoute.addStation(10)");
+		trainRoute.addStation(0);
+		trainRoute.addStation(10);
+		System.out.println(trainRoute.toString());
+		Station station1 = trainRoute.getStation(1);
+		System.out.println("station1.toString(): station1.getLocation()");
+		System.out.println(station1.toString() + ": " + station1.getLocation());
+		Station station2 = trainRoute.getStation(2);
+		System.out.println("station2.toString(): station2.getLocation()");
+		System.out.println(station2.toString() + ": " + station2.getLocation());
+		
+		System.out.println();
+		System.out.println("Testing trainRoute.addTrain(8, Direction.CLOCKWISE, 20)");
+		System.out.println("        trainRoute.addTrain(2, Direction.COUNTER_CLOCKWISE, 30)");
+		trainRoute.addTrain(8, Direction.CLOCKWISE, 20);
+		trainRoute.addTrain(2, Direction.COUNTER_CLOCKWISE, 30);
+		System.out.println(trainRoute.toString());
+		Train train1 = trainRoute.getTrain(1);
+		System.out.println("train1.toString(): train1.getLocation(), train1.getDirection()");
+		System.out.println(train1.toString() + ": " + train1.getLocation() + ", " + train1.getDirection());
+		Train train2 = trainRoute.getTrain(2);
+		System.out.println("train2.toString(): train2.getLocation(), train2.getDirection()");
+		System.out.println(train2.toString() + ": " + train2.getLocation() + ", " + train2.getDirection());
+		
+		System.out.println();
+		System.out.println("Testing trainRoute.addPassengerToStation(new Passenger(1,2));");
+		System.out.println("        trainRoute.addPassengerToStation(new Passenger(2,1));");
+		trainRoute.addPassengerToStation(new Passenger(1,2));
+		trainRoute.addPassengerToStation(new Passenger(2,1));
+		
+		System.out.println();
+		System.out.println("Testing trainRoute.update()");
+		trainRoute.update();
+		
+		System.out.println("Invoke trainRoute.update() 3 more times");
+		trainRoute.update();
+		trainRoute.update();
+		trainRoute.update();
+		
+		System.out.println();
+		
+		Logger.close();
+	}
+	
 }

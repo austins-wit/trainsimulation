@@ -17,10 +17,10 @@ public class TrainSimulation
 	 */
 	public static void main(String[] args) throws FileNotFoundException, IOException
 	{
-		Logger.initialize();
 		Configuration config = new Configuration();
 
 		// Build simulation based on config values.
+		Logger.initialize(config.getDetailedLog());
 		ticks = config.getTicks();
 		trainRoute = new TrainRoute(config.getRoute().length);
 		rand = new Random(config.getSeed());
@@ -71,7 +71,14 @@ public class TrainSimulation
 		int newPassengers = passengersMin + rand.nextInt(passengersMax - passengersMin + 1);
 		for (int i = 0; i < newPassengers; ++i)
 		{
-			trainRoute.addPassengerToStation(new Passenger());
+			int startingStationId = rand.nextInt(trainRoute.getNumberOfStations()) + 1;
+			int destinationStationId;
+			do
+			{
+				destinationStationId = rand.nextInt(trainRoute.getNumberOfStations()) + 1;
+			} while (startingStationId == destinationStationId);
+			
+			trainRoute.addPassengerToStation(new Passenger(startingStationId, destinationStationId));
 		}
 		return newPassengers;
 	}

@@ -18,24 +18,34 @@ public class Train
 	LinkedList<Passenger> passengers;
 	Direction direction;
 	int location;
-	int startingLocation;
 	int routeLength;
 	int passengerCount;
-	int passengerCapacity; //defined by the config
+	int passengerCapacity;
 	int trainID;
 	int stationID;
 	
 	static int trainCounter = 1;
 	
+	/**
+	 * Constructs a train with the following parameters.
+	 * @param routeLength is the length of the route that the train moves along.
+	 * @param passengerCapacity is the maximum number of passengers that the train can hold.
+	 * @param startingLocation is the part of the trainRoute that the train is starting on.
+	 * @param direction is the direction that the train is moving (clockwise or counter-clockwise).
+	 */
 	public Train(int routeLength, int passengerCapacity, int startingLocation, Direction direction)
 	{
 		this.routeLength = routeLength;
+		this.passengers = new LinkedList<Passenger>();
 		this.passengerCapacity = passengerCapacity;
-		this.startingLocation = startingLocation;
+		this.location = startingLocation;
 		this.direction = direction;
 		this.trainID = trainCounter++;
 	}
 	
+	/**
+	 * Checks to see which direction is assigned to the train, then moves it in that direction.
+	 */
 	public void move()
 	{
 		if(direction == Direction.CLOCKWISE)
@@ -56,6 +66,10 @@ public class Train
 		}
 	}
 	
+	/**
+	 * Checks the passenger count with the passenger capacity to tell whether the train is full or not.
+	 * @return the boolean value corresponding to whether or not the train is at maximum capacity.
+	 */
 	public boolean isFull()
 	{
 		if(passengerCount == passengerCapacity)
@@ -65,12 +79,17 @@ public class Train
 		return false;
 	}
 	
+	/**
+	 * Checks the passenger's destination station with the ID of the station that the train is currently at, & if they
+	 * match, the train disembarks (removes from the list) that passenger & decrements the passenger count.
+	 * @param stationID is the ID of the station that will be checked with the passenger's destination.
+	 */
 	public void disembarkPassengers(int stationID)
 	{
 		for(Iterator<Passenger> iterator = passengers.iterator(); iterator.hasNext();)
 		{
 			Passenger passenger = iterator.next();
-			if(passenger.getDestination() == stationID)
+			if(passenger.getDestinationStationId() == stationID)
 			{
 				iterator.remove();
 				passengerCount--;
@@ -78,30 +97,76 @@ public class Train
 		}
 	}
 	
+	/**
+	 *  Takes a passenger from a station, adds it to the list of passengers, and increments the passenger count.
+	 *  @param passenger is the passenger being given to the train by the station.
+	 */
 	public void boardPassengers(Passenger passenger)
 	{	
 		passengers.add(passenger);
 		passengerCount++;
 	}
 	
-	public int getTrainID()
+	/**
+	 * Returns the numeric ID of the train.
+	 * @return the ID of the train
+	 */
+	public  int getTrainID()
 	{
 		return trainID;
 	}
 	
+	/**
+	 * Returns the direction of the train.
+	 * @return the direction of the train.
+	 */
 	public Direction getDirection()
 	{
 		return direction;
 	}
 	
+	/**
+	 * Returns the location of the train.
+	 * @return the location of the train.
+	 */
 	public int getLocation()
 	{
 		return location;
 	}
 	
+	/**
+	 * Overridden toString() method, changes the train ID from a number to a string that includes "train" and the number.
+	 * @return the string of "Train" plus the ID of that train.
+	 */
 	@Override
 	public String toString()
 	{
 		return "Train " + trainID;
+	}
+	
+	
+	/**
+	 * Meant to test the methods of the class & ensure that no program-crippling bugs get through.
+	 * @param args -unused
+	 */
+	public static void main(String[] args)
+	{
+		Train train = new Train(20, 50, 5, Direction.CLOCKWISE);
+		
+		train.passengerCount = 50;
+		
+		System.out.println(train.getTrainID());
+		System.out.println(train.getDirection());
+		System.out.println(train.getLocation());
+		System.out.println(train.toString());
+		System.out.println(train.isFull());
+		
+		train.passengerCount = 45;
+		
+		System.out.println(train.isFull());
+		
+		train.move();
+		
+		System.out.println(train.getLocation());
 	}
 }
