@@ -1,3 +1,12 @@
+/*
+ * Group #32
+ * Scott Austin, Nico De Paolis, Corey Pierce
+ * COMP 2000-03
+ * Application 3: Train Simulation
+ * Due Monday 10/30/2017
+ * 
+ * This project is a implementation of simple simulation of a train route. 
+ */
 package edu.wit.dcsn.comp2000.queueapp;
 
 import java.util.Iterator;
@@ -80,21 +89,26 @@ public class Train
 	}
 	
 	/**
-	 * Checks the passenger's destination station with the ID of the station that the train is currently at, & if they
-	 * match, the train disembarks (removes from the list) that passenger & decrements the passenger count.
+	 * Checks the passenger's destination station with the ID of the station that the train is currently at, and if they
+	 * match, the train disembarks (removes from the list) that passenger and decrements the passenger count.
 	 * @param stationID is the ID of the station that will be checked with the passenger's destination.
+	 * @return the number of passengers that disembarked.
 	 */
-	public void disembarkPassengers(int stationID)
+	public int disembarkPassengers(int stationID)
 	{
+		int passengersDisembarked = 0;
 		for(Iterator<Passenger> iterator = passengers.iterator(); iterator.hasNext();)
 		{
 			Passenger passenger = iterator.next();
-			if(passenger.getDestinationStationId() == stationID)
+			if(passenger.getDestinationStation() == stationID)
 			{
+				Logger.passengerDisembarksFromTrain(passenger, this);
 				iterator.remove();
 				passengerCount--;
+				passengersDisembarked++;
 			}
 		}
+		return passengersDisembarked;
 	}
 	
 	/**
@@ -146,7 +160,7 @@ public class Train
 	
 	
 	/**
-	 * Meant to test the methods of the class & ensure that no program-crippling bugs get through.
+	 * Meant to test the methods of the class and ensure that no program-crippling bugs get through.
 	 * @param args -unused
 	 */
 	public static void main(String[] args)

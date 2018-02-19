@@ -1,3 +1,12 @@
+/*
+ * Group #32
+ * Scott Austin, Nico De Paolis, Corey Pierce
+ * COMP 2000-03
+ * Application 3: Train Simulation
+ * Due Monday 10/30/2017
+ * 
+ * This project is a implementation of simple simulation of a train route. 
+ */
 package edu.wit.dcsn.comp2000.queueapp;
 
 import java.io.IOException;
@@ -37,7 +46,7 @@ public class TrainRoute
 	 */
 	public void addPassengerToStation(Passenger passenger)
 	{
-		int stationId = passenger.getStartingStationId();
+		int stationId = passenger.getStartingStation();
 		Station station = getStation(stationId);
 		station.passengerArrives(passenger);
 		Logger.passengerArrivesAtStation(passenger, station);
@@ -55,7 +64,7 @@ public class TrainRoute
 	/**
 	 * Add a train to the route.
 	 * @param location The location of the train on the route.
-	 * @param inbound The direction of the train.
+	 * @param direction The direction of the train.
 	 * @param capacity The capacity of the train.
 	 */
 	public void addTrain(int location, Direction direction, int capacity)
@@ -175,8 +184,13 @@ public class TrainRoute
 				 if (train.getLocation() == station.getLocation())
 				 {
 					 Logger.trainArrivedAtStation(train, station);
-				     train.disembarkPassengers(station.getId());
-				     station.trainArrives(train);
+					 
+				     int passengersDisembarked = train.disembarkPassengers(station.getId());
+				     Logger.passengersHaveDisembarkedTrainAtStation(passengersDisembarked, train, station);
+				     
+				     int passengersBoarded = station.trainArrives(train);
+				     Logger.passengersHaveBoardedTrainAtStation(passengersBoarded, train, station);
+				     
 				     break;
 				 }
 			}
@@ -186,6 +200,7 @@ public class TrainRoute
 	/**
 	 * Unit test driver for the train route.
 	 * @param args  -unused-
+	 * @throws IOException if log file cannot be opened
 	 */
 	public static void main(String[] args) throws IOException
 	{

@@ -1,3 +1,12 @@
+/*
+ * Group #32
+ * Scott Austin, Nico De Paolis, Corey Pierce
+ * COMP 2000-03
+ * Application 3: Train Simulation
+ * Due Monday 10/30/2017
+ * 
+ * This project is a implementation of simple simulation of a train route. 
+ */
 package edu.wit.dcsn.comp2000.queueapp;
 
 import java.io.FileNotFoundException;
@@ -5,6 +14,11 @@ import java.io.IOException;
 import java.util.Random;
 import edu.wit.dcsn.ds.rosenbergd.queueapp.Configuration;
 
+/**
+ * Simulates a train route based off of values loaded from a configuration file.
+ * @author Scott Austin
+ *
+ */
 public class TrainSimulation
 {
 	private static TrainRoute trainRoute;
@@ -13,7 +27,9 @@ public class TrainSimulation
 
 	/**
 	 * Runs a simulation of a train route.
-	 * @param args
+	 * @param args -unused-
+	 * @throws FileNotFoundException if log/config file cannot be loaded
+	 * @throws FileNotFoundException if log/config file cannot be loaded
 	 */
 	public static void main(String[] args) throws FileNotFoundException, IOException
 	{
